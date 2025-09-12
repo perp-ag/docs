@@ -29,5 +29,18 @@
   "logo": {
     "light": "/logo/logo.png",
     "dark": "/logo/logo.png"
+  },
+  "navbar": {
+    "primary": {
+      "type": "button",
+      "label": "Trade Now",
+      "href": "https://app.perp.ag/"
+    }
+  },
+  "footer": {
+    "socials": {
+      "twitter": "https://x.com/perp_ag",
+      "github": "https://github.com/perp-ag"
+    }
   }
 }
