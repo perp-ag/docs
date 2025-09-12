@@ -4,8 +4,8 @@
   "name": "Perp.ag Documentation",
   "colors": {
     "primary": "#4f46e5",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "light": "#4f46e5",
+    "dark": "#4f46e5"
   },
   "favicon": "/logo.png",
   "navigation": {
