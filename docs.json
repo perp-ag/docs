@@ -16,8 +16,8 @@
           {
             "group": "Getting Started",
             "pages": [
-              "index",
               "overview",
+              "getting-started",
               "how-to-copy-trade",
               "referrals"
             ]
