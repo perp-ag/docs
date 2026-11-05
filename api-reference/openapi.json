@@ -1,0 +1,4632 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Perp.ag Data API",
+    "version": "1.0.0",
+    "description": "Trader analytics for Lighter, RH Lighter, Jupiter, Phoenix, Bullet and Aftermath. API keys are issued on request: message @perp_ag on X.",
+    "contact": {
+      "name": "Perp.ag",
+      "url": "https://x.com/perp_ag"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.reperp.xyz/api/v1",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "apiKey": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Traders",
+      "description": "Leaderboards and Copy Scores."
+    },
+    {
+      "name": "Wallet analytics",
+      "description": "Metrics and PnL of one wallet."
+    },
+    {
+      "name": "Positions and trades",
+      "description": "What a wallet holds, every fill, and money in and out."
+    },
+    {
+      "name": "Market",
+      "description": "Cohorts, markets and venue rankings."
+    }
+  ],
+  "paths": {
+    "/wallet/discover": {
+      "get": {
+        "tags": [
+          "Traders"
+        ],
+        "summary": "List traders",
+        "description": "The leaderboard: every wallet on a venue with its 7D, 30D and all-time metrics, its Copy Score and a PnL chart, filtered and sorted. Paged with `page` and `limit`.\n\nEach row carries a daily PnL chart, so large pages are slow. Ask for what you need.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/platform"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "description": "Sort column.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "total_pnl_after_fee",
+                "total_trades",
+                "total_avg_trade_size",
+                "total_volume",
+                "total_win_rate",
+                "total_pnl_delta",
+                "total_profit",
+                "total_drawdown",
+                "total_pnl_ratio",
+                "30d_pnl_after_fee",
+                "30d_trades",
+                "30d_avg_trade_size",
+                "30d_volume",
+                "30d_win_rate",
+                "30d_pnl_delta",
+                "30d_profit",
+                "30d_drawdown",
+                "30d_pnl_ratio",
+                "7d_pnl_after_fee",
+                "7d_trades",
+                "7d_avg_trade_size",
+                "7d_volume",
+                "7d_win_rate",
+                "7d_pnl_delta",
+                "7d_profit",
+                "7d_drawdown",
+                "7d_pnl_ratio",
+                "copy_score",
+                "perf_score",
+                "copyability",
+                "sharpe_score",
+                "drawdown_score",
+                "consistency_score",
+                "confidence"
+              ],
+              "default": "copy_score"
+            }
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "description": "Sort direction.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page, from 1.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Rows per page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100
+            }
+          },
+          {
+            "name": "chart_range",
+            "in": "query",
+            "required": false,
+            "description": "Window of the PnL chart in each row.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "7d",
+                "30d",
+                "all"
+              ]
+            }
+          },
+          {
+            "name": "copy_score_tier",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets in these Copy Score tiers. Repeat the parameter for several tiers.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "S",
+                  "A",
+                  "B",
+                  "C",
+                  "D"
+                ]
+              }
+            }
+          },
+          {
+            "name": "gte_copy_score",
+            "in": "query",
+            "required": false,
+            "description": "Minimum Copy Score.",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "lte_copy_score",
+            "in": "query",
+            "required": false,
+            "description": "Maximum Copy Score.",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "direction_bias_label",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets with this directional lean.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Long-only",
+                "Long-biased",
+                "Balanced",
+                "Short-biased",
+                "Short-only"
+              ]
+            }
+          },
+          {
+            "name": "direction_edge",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets with this edge.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Bull specialist",
+                "Bear specialist",
+                "Two-sided"
+              ]
+            }
+          },
+          {
+            "name": "last_activity",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets that traded within this window.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "24h",
+                "7d",
+                "30d",
+                "3m"
+              ],
+              "default": "all"
+            }
+          },
+          {
+            "name": "gte_total_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl after fee is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl after fee is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total trades is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total trades is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total avg trade size is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total avg trade size is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total volume is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total volume is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total win rate is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total win rate is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl delta is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl delta is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total profit is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total profit is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total drawdown is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total drawdown is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl ratio is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl ratio is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl after fee is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl after fee is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d trades is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d trades is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d avg trade size is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d avg trade size is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d volume is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d volume is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d win rate is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d win rate is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl delta is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl delta is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d profit is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d profit is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d drawdown is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d drawdown is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl ratio is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl ratio is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl after fee is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl after fee is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d trades is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d trades is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d avg trade size is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d avg trade size is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d volume is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d volume is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d win rate is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d win rate is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl delta is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl delta is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d profit is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d profit is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d drawdown is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d drawdown is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl ratio is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl ratio is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "address": {
+                                "type": "string",
+                                "description": "Wallet (owner). See Venues and identifiers for its format."
+                              },
+                              "lastActivity": {
+                                "type": "string",
+                                "description": "Last trade.",
+                                "format": "date-time"
+                              },
+                              "metrics": {
+                                "type": "object",
+                                "properties": {
+                                  "all": {
+                                    "type": "object",
+                                    "properties": {
+                                      "pnl": {
+                                        "type": "number",
+                                        "description": "Realized PnL before fees in the window."
+                                      },
+                                      "totalPnlAfterFee": {
+                                        "type": "number",
+                                        "description": "Realized PnL after fees in the window."
+                                      },
+                                      "totalProfit": {
+                                        "type": "number",
+                                        "description": "Sum of winning closes."
+                                      },
+                                      "totalLoss": {
+                                        "type": "number",
+                                        "description": "Sum of losing closes (negative)."
+                                      },
+                                      "winRate": {
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ],
+                                        "description": "Share of closing trades that made money, as a fraction (0.62 = 62%)."
+                                      },
+                                      "totalTrades": {
+                                        "type": "integer",
+                                        "description": "Closing trades."
+                                      },
+                                      "avgTradeSize": {
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ],
+                                        "description": "Average notional per trade, USD."
+                                      },
+                                      "volume": {
+                                        "type": "number",
+                                        "description": "Traded notional, USD."
+                                      },
+                                      "drawdown": {
+                                        "type": "number",
+                                        "description": "Max drawdown as a fraction from -1 to 0 (-0.25 = 25% from the peak)."
+                                      },
+                                      "pnlRatio": {
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ],
+                                        "description": "Profit factor: total profit divided by the absolute total loss."
+                                      }
+                                    },
+                                    "description": "Metrics for one window."
+                                  },
+                                  "30d": {
+                                    "type": "object",
+                                    "properties": {
+                                      "pnl": {
+                                        "type": "number",
+                                        "description": "Realized PnL before fees in the window."
+                                      },
+                                      "totalPnlAfterFee": {
+                                        "type": "number",
+                                        "description": "Realized PnL after fees in the window."
+                                      },
+                                      "totalProfit": {
+                                        "type": "number",
+                                        "description": "Sum of winning closes."
+                                      },
+                                      "totalLoss": {
+                                        "type": "number",
+                                        "description": "Sum of losing closes (negative)."
+                                      },
+                                      "winRate": {
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ],
+                                        "description": "Share of closing trades that made money, as a fraction (0.62 = 62%)."
+                                      },
+                                      "totalTrades": {
+                                        "type": "integer",
+                                        "description": "Closing trades."
+                                      },
+                                      "avgTradeSize": {
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ],
+                                        "description": "Average notional per trade, USD."
+                                      },
+                                      "volume": {
+                                        "type": "number",
+                                        "description": "Traded notional, USD."
+                                      },
+                                      "drawdown": {
+                                        "type": "number",
+                                        "description": "Max drawdown as a fraction from -1 to 0 (-0.25 = 25% from the peak)."
+                                      },
+                                      "pnlRatio": {
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ],
+                                        "description": "Profit factor: total profit divided by the absolute total loss."
+                                      }
+                                    },
+                                    "description": "Metrics for one window."
+                                  },
+                                  "7d": {
+                                    "type": "object",
+                                    "properties": {
+                                      "pnl": {
+                                        "type": "number",
+                                        "description": "Realized PnL before fees in the window."
+                                      },
+                                      "totalPnlAfterFee": {
+                                        "type": "number",
+                                        "description": "Realized PnL after fees in the window."
+                                      },
+                                      "totalProfit": {
+                                        "type": "number",
+                                        "description": "Sum of winning closes."
+                                      },
+                                      "totalLoss": {
+                                        "type": "number",
+                                        "description": "Sum of losing closes (negative)."
+                                      },
+                                      "winRate": {
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ],
+                                        "description": "Share of closing trades that made money, as a fraction (0.62 = 62%)."
+                                      },
+                                      "totalTrades": {
+                                        "type": "integer",
+                                        "description": "Closing trades."
+                                      },
+                                      "avgTradeSize": {
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ],
+                                        "description": "Average notional per trade, USD."
+                                      },
+                                      "volume": {
+                                        "type": "number",
+                                        "description": "Traded notional, USD."
+                                      },
+                                      "drawdown": {
+                                        "type": "number",
+                                        "description": "Max drawdown as a fraction from -1 to 0 (-0.25 = 25% from the peak)."
+                                      },
+                                      "pnlRatio": {
+                                        "type": [
+                                          "number",
+                                          "null"
+                                        ],
+                                        "description": "Profit factor: total profit divided by the absolute total loss."
+                                      }
+                                    },
+                                    "description": "Metrics for one window."
+                                  }
+                                }
+                              },
+                              "copyScore": {
+                                "type": "object",
+                                "properties": {
+                                  "score": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ],
+                                    "description": "Copy Score, 0 to 100. Null when the wallet is not eligible."
+                                  },
+                                  "tier": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ],
+                                    "description": "Percentile tier among scored wallets on the venue.",
+                                    "enum": [
+                                      "S",
+                                      "A",
+                                      "B",
+                                      "C",
+                                      "D"
+                                    ]
+                                  },
+                                  "eligibilityReason": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ],
+                                    "description": "Why there is no score. Null when scored.",
+                                    "enum": [
+                                      "insufficient_history",
+                                      "dormant"
+                                    ]
+                                  },
+                                  "perf": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ],
+                                    "description": "Performance part of the score (Sharpe, drawdown, consistency, net PnL)."
+                                  },
+                                  "copyability": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ],
+                                    "description": "How practical the wallet is to mirror, from frequency and sizing."
+                                  },
+                                  "sharpe": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ],
+                                    "description": "Sharpe sub-score."
+                                  },
+                                  "drawdown": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ],
+                                    "description": "Drawdown sub-score. Higher means shallower drawdowns."
+                                  },
+                                  "consistency": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ],
+                                    "description": "Win rate and profit factor combined."
+                                  },
+                                  "frequency": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ],
+                                    "description": "Lower when the wallet trades very often."
+                                  },
+                                  "sizing": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ],
+                                    "description": "Lower when position sizes vary a lot."
+                                  },
+                                  "confidence": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ],
+                                    "description": "How much trade history backs the score."
+                                  },
+                                  "directionBias": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ],
+                                    "description": "Long share of positions."
+                                  },
+                                  "directionBiasLabel": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ],
+                                    "description": "Directional lean.",
+                                    "enum": [
+                                      "Long-only",
+                                      "Long-biased",
+                                      "Balanced",
+                                      "Short-biased",
+                                      "Short-only"
+                                    ]
+                                  },
+                                  "directionEdge": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ],
+                                    "description": "Which side the wallet makes money on.",
+                                    "enum": [
+                                      "Bull specialist",
+                                      "Bear specialist",
+                                      "Two-sided"
+                                    ]
+                                  }
+                                },
+                                "description": "Copy Score of a wallet. See the Metrics page for how it is computed."
+                              },
+                              "chartData": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "date": {
+                                      "type": "string",
+                                      "description": "Day.",
+                                      "format": "date"
+                                    },
+                                    "pnl": {
+                                      "type": "number",
+                                      "description": "Realized PnL after fees that day."
+                                    },
+                                    "cumulativePnl": {
+                                      "type": "number",
+                                      "description": "Running total. On Lighter and RH Lighter this is total equity (realized plus unrealized); elsewhere realized PnL after fees."
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "currentPage": {
+                              "type": "integer",
+                              "description": "Current page, from 1."
+                            },
+                            "totalPages": {
+                              "type": "integer",
+                              "description": "Number of pages."
+                            },
+                            "totalCount": {
+                              "type": "integer",
+                              "description": "Number of matching rows."
+                            },
+                            "pageSize": {
+                              "type": "integer",
+                              "description": "Rows per page."
+                            }
+                          }
+                        },
+                        "asOf": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Freshness of the underlying data, YYYY-MM-DD HH24:MI (UTC)."
+                        }
+                      },
+                      "description": "Note the nested data: the rows are in data.data."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/wallet/count": {
+      "get": {
+        "tags": [
+          "Traders"
+        ],
+        "summary": "Count traders",
+        "description": "How many wallets match a set of leaderboard filters, and how many the venue has in total. Takes the same filters as List traders.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/platform"
+          },
+          {
+            "name": "copy_score_tier",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets in these Copy Score tiers. Repeat the parameter for several tiers.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "S",
+                  "A",
+                  "B",
+                  "C",
+                  "D"
+                ]
+              }
+            }
+          },
+          {
+            "name": "gte_copy_score",
+            "in": "query",
+            "required": false,
+            "description": "Minimum Copy Score.",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "lte_copy_score",
+            "in": "query",
+            "required": false,
+            "description": "Maximum Copy Score.",
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "direction_bias_label",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets with this directional lean.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Long-only",
+                "Long-biased",
+                "Balanced",
+                "Short-biased",
+                "Short-only"
+              ]
+            }
+          },
+          {
+            "name": "direction_edge",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets with this edge.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Bull specialist",
+                "Bear specialist",
+                "Two-sided"
+              ]
+            }
+          },
+          {
+            "name": "last_activity",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets that traded within this window.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "24h",
+                "7d",
+                "30d",
+                "3m"
+              ],
+              "default": "all"
+            }
+          },
+          {
+            "name": "gte_total_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl after fee is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl after fee is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total trades is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total trades is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total avg trade size is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total avg trade size is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total volume is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total volume is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total win rate is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total win rate is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl delta is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl delta is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total profit is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total profit is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total drawdown is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total drawdown is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_total_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl ratio is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_total_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose total pnl ratio is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl after fee is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl after fee is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d trades is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d trades is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d avg trade size is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d avg trade size is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d volume is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d volume is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d win rate is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d win rate is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl delta is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl delta is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d profit is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d profit is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d drawdown is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d drawdown is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_30d_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl ratio is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_30d_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 30d pnl ratio is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl after fee is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_pnl_after_fee",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl after fee is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d trades is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_trades",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d trades is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d avg trade size is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_avg_trade_size",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d avg trade size is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d volume is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_volume",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d volume is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d win rate is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_win_rate",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d win rate is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl delta is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_pnl_delta",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl delta is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d profit is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_profit",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d profit is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d drawdown is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_drawdown",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d drawdown is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "gte_7d_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl ratio is at least this value.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lte_7d_pnl_ratio",
+            "in": "query",
+            "required": false,
+            "description": "Keep wallets whose 7d pnl ratio is at most this value.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "count": {
+                          "type": "integer",
+                          "description": "Wallets matching the filters."
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "All wallets on the venue."
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/wallet/copy-score/{owner}": {
+      "get": {
+        "tags": [
+          "Traders"
+        ],
+        "summary": "Get a Copy Score",
+        "description": "The Copy Score of one wallet with its tier, sub-scores and style tags. A wallet without enough recent history returns null scores and an `eligibilityReason`.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/platform"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "score": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Copy Score, 0 to 100. Null when the wallet is not eligible."
+                        },
+                        "tier": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Percentile tier among scored wallets on the venue.",
+                          "enum": [
+                            "S",
+                            "A",
+                            "B",
+                            "C",
+                            "D"
+                          ]
+                        },
+                        "eligibilityReason": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Why there is no score. Null when scored.",
+                          "enum": [
+                            "insufficient_history",
+                            "dormant"
+                          ]
+                        },
+                        "perf": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Performance part of the score (Sharpe, drawdown, consistency, net PnL)."
+                        },
+                        "copyability": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "How practical the wallet is to mirror, from frequency and sizing."
+                        },
+                        "sharpe": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Sharpe sub-score."
+                        },
+                        "drawdown": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Drawdown sub-score. Higher means shallower drawdowns."
+                        },
+                        "consistency": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Win rate and profit factor combined."
+                        },
+                        "frequency": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Lower when the wallet trades very often."
+                        },
+                        "sizing": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Lower when position sizes vary a lot."
+                        },
+                        "confidence": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "How much trade history backs the score."
+                        },
+                        "directionBias": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Long share of positions."
+                        },
+                        "directionBiasLabel": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Directional lean.",
+                          "enum": [
+                            "Long-only",
+                            "Long-biased",
+                            "Balanced",
+                            "Short-biased",
+                            "Short-only"
+                          ]
+                        },
+                        "directionEdge": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Which side the wallet makes money on.",
+                          "enum": [
+                            "Bull specialist",
+                            "Bear specialist",
+                            "Two-sided"
+                          ]
+                        }
+                      },
+                      "description": "Copy Score of a wallet. See the Metrics page for how it is computed."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/positions/overview/{owner}": {
+      "get": {
+        "tags": [
+          "Wallet analytics"
+        ],
+        "summary": "Get wallet overview",
+        "description": "Headline metrics of one wallet for every range at once: PnL, fees, volume, trades, win rate, expected value and max drawdown. A wallet we have no data for returns zeros.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/platform"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "7D": {
+                          "type": "object",
+                          "properties": {
+                            "total_profit": {
+                              "type": "number",
+                              "description": "Sum of winning closes."
+                            },
+                            "total_loss": {
+                              "type": "number",
+                              "description": "Sum of losing closes (negative)."
+                            },
+                            "total_fee_paid": {
+                              "type": "number",
+                              "description": "Trading fees paid."
+                            },
+                            "total_pnl_after_fee": {
+                              "type": "number",
+                              "description": "Realized PnL after fees."
+                            },
+                            "total_long_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of long positions."
+                            },
+                            "total_short_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of short positions."
+                            },
+                            "total_trades": {
+                              "type": "integer",
+                              "description": "Closing trades."
+                            },
+                            "avg_trade_size": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Average notional per trade."
+                            },
+                            "total_volume": {
+                              "type": "number",
+                              "description": "Traded notional."
+                            },
+                            "total_long_volume": {
+                              "type": "number",
+                              "description": "Traded notional on longs."
+                            },
+                            "total_short_volume": {
+                              "type": "number",
+                              "description": "Traded notional on shorts."
+                            },
+                            "win_rate": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Share of closing trades that made money, as a fraction."
+                            },
+                            "expected_value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Expected PnL per closing trade."
+                            },
+                            "max_drawdown": {
+                              "type": "number",
+                              "description": "Max drawdown as a fraction from -1 to 0."
+                            }
+                          }
+                        },
+                        "1M": {
+                          "type": "object",
+                          "properties": {
+                            "total_profit": {
+                              "type": "number",
+                              "description": "Sum of winning closes."
+                            },
+                            "total_loss": {
+                              "type": "number",
+                              "description": "Sum of losing closes (negative)."
+                            },
+                            "total_fee_paid": {
+                              "type": "number",
+                              "description": "Trading fees paid."
+                            },
+                            "total_pnl_after_fee": {
+                              "type": "number",
+                              "description": "Realized PnL after fees."
+                            },
+                            "total_long_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of long positions."
+                            },
+                            "total_short_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of short positions."
+                            },
+                            "total_trades": {
+                              "type": "integer",
+                              "description": "Closing trades."
+                            },
+                            "avg_trade_size": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Average notional per trade."
+                            },
+                            "total_volume": {
+                              "type": "number",
+                              "description": "Traded notional."
+                            },
+                            "total_long_volume": {
+                              "type": "number",
+                              "description": "Traded notional on longs."
+                            },
+                            "total_short_volume": {
+                              "type": "number",
+                              "description": "Traded notional on shorts."
+                            },
+                            "win_rate": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Share of closing trades that made money, as a fraction."
+                            },
+                            "expected_value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Expected PnL per closing trade."
+                            },
+                            "max_drawdown": {
+                              "type": "number",
+                              "description": "Max drawdown as a fraction from -1 to 0."
+                            }
+                          }
+                        },
+                        "3M": {
+                          "type": "object",
+                          "properties": {
+                            "total_profit": {
+                              "type": "number",
+                              "description": "Sum of winning closes."
+                            },
+                            "total_loss": {
+                              "type": "number",
+                              "description": "Sum of losing closes (negative)."
+                            },
+                            "total_fee_paid": {
+                              "type": "number",
+                              "description": "Trading fees paid."
+                            },
+                            "total_pnl_after_fee": {
+                              "type": "number",
+                              "description": "Realized PnL after fees."
+                            },
+                            "total_long_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of long positions."
+                            },
+                            "total_short_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of short positions."
+                            },
+                            "total_trades": {
+                              "type": "integer",
+                              "description": "Closing trades."
+                            },
+                            "avg_trade_size": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Average notional per trade."
+                            },
+                            "total_volume": {
+                              "type": "number",
+                              "description": "Traded notional."
+                            },
+                            "total_long_volume": {
+                              "type": "number",
+                              "description": "Traded notional on longs."
+                            },
+                            "total_short_volume": {
+                              "type": "number",
+                              "description": "Traded notional on shorts."
+                            },
+                            "win_rate": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Share of closing trades that made money, as a fraction."
+                            },
+                            "expected_value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Expected PnL per closing trade."
+                            },
+                            "max_drawdown": {
+                              "type": "number",
+                              "description": "Max drawdown as a fraction from -1 to 0."
+                            }
+                          }
+                        },
+                        "1Y": {
+                          "type": "object",
+                          "properties": {
+                            "total_profit": {
+                              "type": "number",
+                              "description": "Sum of winning closes."
+                            },
+                            "total_loss": {
+                              "type": "number",
+                              "description": "Sum of losing closes (negative)."
+                            },
+                            "total_fee_paid": {
+                              "type": "number",
+                              "description": "Trading fees paid."
+                            },
+                            "total_pnl_after_fee": {
+                              "type": "number",
+                              "description": "Realized PnL after fees."
+                            },
+                            "total_long_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of long positions."
+                            },
+                            "total_short_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of short positions."
+                            },
+                            "total_trades": {
+                              "type": "integer",
+                              "description": "Closing trades."
+                            },
+                            "avg_trade_size": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Average notional per trade."
+                            },
+                            "total_volume": {
+                              "type": "number",
+                              "description": "Traded notional."
+                            },
+                            "total_long_volume": {
+                              "type": "number",
+                              "description": "Traded notional on longs."
+                            },
+                            "total_short_volume": {
+                              "type": "number",
+                              "description": "Traded notional on shorts."
+                            },
+                            "win_rate": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Share of closing trades that made money, as a fraction."
+                            },
+                            "expected_value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Expected PnL per closing trade."
+                            },
+                            "max_drawdown": {
+                              "type": "number",
+                              "description": "Max drawdown as a fraction from -1 to 0."
+                            }
+                          }
+                        },
+                        "YTD": {
+                          "type": "object",
+                          "properties": {
+                            "total_profit": {
+                              "type": "number",
+                              "description": "Sum of winning closes."
+                            },
+                            "total_loss": {
+                              "type": "number",
+                              "description": "Sum of losing closes (negative)."
+                            },
+                            "total_fee_paid": {
+                              "type": "number",
+                              "description": "Trading fees paid."
+                            },
+                            "total_pnl_after_fee": {
+                              "type": "number",
+                              "description": "Realized PnL after fees."
+                            },
+                            "total_long_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of long positions."
+                            },
+                            "total_short_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of short positions."
+                            },
+                            "total_trades": {
+                              "type": "integer",
+                              "description": "Closing trades."
+                            },
+                            "avg_trade_size": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Average notional per trade."
+                            },
+                            "total_volume": {
+                              "type": "number",
+                              "description": "Traded notional."
+                            },
+                            "total_long_volume": {
+                              "type": "number",
+                              "description": "Traded notional on longs."
+                            },
+                            "total_short_volume": {
+                              "type": "number",
+                              "description": "Traded notional on shorts."
+                            },
+                            "win_rate": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Share of closing trades that made money, as a fraction."
+                            },
+                            "expected_value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Expected PnL per closing trade."
+                            },
+                            "max_drawdown": {
+                              "type": "number",
+                              "description": "Max drawdown as a fraction from -1 to 0."
+                            }
+                          }
+                        },
+                        "ALL": {
+                          "type": "object",
+                          "properties": {
+                            "total_profit": {
+                              "type": "number",
+                              "description": "Sum of winning closes."
+                            },
+                            "total_loss": {
+                              "type": "number",
+                              "description": "Sum of losing closes (negative)."
+                            },
+                            "total_fee_paid": {
+                              "type": "number",
+                              "description": "Trading fees paid."
+                            },
+                            "total_pnl_after_fee": {
+                              "type": "number",
+                              "description": "Realized PnL after fees."
+                            },
+                            "total_long_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of long positions."
+                            },
+                            "total_short_pnl": {
+                              "type": "number",
+                              "description": "Realized PnL of short positions."
+                            },
+                            "total_trades": {
+                              "type": "integer",
+                              "description": "Closing trades."
+                            },
+                            "avg_trade_size": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Average notional per trade."
+                            },
+                            "total_volume": {
+                              "type": "number",
+                              "description": "Traded notional."
+                            },
+                            "total_long_volume": {
+                              "type": "number",
+                              "description": "Traded notional on longs."
+                            },
+                            "total_short_volume": {
+                              "type": "number",
+                              "description": "Traded notional on shorts."
+                            },
+                            "win_rate": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Share of closing trades that made money, as a fraction."
+                            },
+                            "expected_value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Expected PnL per closing trade."
+                            },
+                            "max_drawdown": {
+                              "type": "number",
+                              "description": "Max drawdown as a fraction from -1 to 0."
+                            }
+                          }
+                        }
+                      },
+                      "description": "One block per range."
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/positions/analytics/{owner}": {
+      "get": {
+        "tags": [
+          "Wallet analytics"
+        ],
+        "summary": "Get PnL history",
+        "description": "Realized PnL of one wallet over time, per day, week, month or year, with running totals. Use it for a realized PnL chart; use Get equity curve to include open positions.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/platform"
+          },
+          {
+            "$ref": "#/components/parameters/range"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "description": "Bucket size.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "year"
+              ],
+              "default": "day"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "date": {
+                            "type": "string",
+                            "description": "Day (UTC), or the first day of the bucket.",
+                            "format": "date"
+                          },
+                          "pnl_delta": {
+                            "type": "number",
+                            "description": "Realized PnL before fees in the bucket."
+                          },
+                          "fee_usd": {
+                            "type": "number",
+                            "description": "Fees paid in the bucket."
+                          },
+                          "pnl_after_fee": {
+                            "type": "number",
+                            "description": "Realized PnL after fees in the bucket."
+                          },
+                          "transfer_amount_usd": {
+                            "type": "number",
+                            "description": "Net collateral transferred in the bucket."
+                          },
+                          "size_usd_delta": {
+                            "type": "number",
+                            "description": "Notional traded in the bucket."
+                          },
+                          "cumulative_pnl_delta": {
+                            "type": "number",
+                            "description": "Running total of pnl_delta."
+                          },
+                          "cumulative_fee_usd": {
+                            "type": "number",
+                            "description": "Running total of fees."
+                          },
+                          "cumulative_pnl_after_fee": {
+                            "type": "number",
+                            "description": "Running total of realized PnL after fees."
+                          },
+                          "cumulative_size_usd_delta": {
+                            "type": "number",
+                            "description": "Running total of notional traded."
+                          },
+                          "first_activity": {
+                            "type": "string",
+                            "description": "First activity of the wallet (daily buckets only).",
+                            "format": "date-time"
+                          },
+                          "last_activity": {
+                            "type": "string",
+                            "description": "Last activity of the wallet (daily buckets only).",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/positions/equity/{owner}": {
+      "get": {
+        "tags": [
+          "Wallet analytics"
+        ],
+        "summary": "Get equity curve",
+        "description": "Daily realized PnL, unrealized PnL and total equity of one wallet. The series starts no earlier than 2026-01-01, but `cumulative_pnl_after_fee` carries the full lifetime total. On Bullet, `unrealized_pnl` is 0 (realized only).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/platform"
+          },
+          {
+            "$ref": "#/components/parameters/range"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "date": {
+                            "type": "string",
+                            "description": "Day (UTC).",
+                            "format": "date"
+                          },
+                          "cumulative_pnl_after_fee": {
+                            "type": "number",
+                            "description": "Lifetime realized PnL after fees up to this day."
+                          },
+                          "unrealized_pnl": {
+                            "type": "number",
+                            "description": "PnL of positions open at the end of the day."
+                          },
+                          "total_equity": {
+                            "type": "number",
+                            "description": "cumulative_pnl_after_fee plus unrealized_pnl."
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/positions/asset-performance/{owner}": {
+      "get": {
+        "tags": [
+          "Wallet analytics"
+        ],
+        "summary": "Get performance by market",
+        "description": "Per-market wins, losses, win rate, long/short volume and realized PnL of one wallet, sorted by PnL (best first).",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/platform"
+          },
+          {
+            "$ref": "#/components/parameters/range"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "marketKey": {
+                            "type": "string",
+                            "description": "Venue market key."
+                          },
+                          "symbol": {
+                            "type": "string",
+                            "description": "Market symbol, for example BTC."
+                          },
+                          "logo": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Logo URL."
+                          },
+                          "wins": {
+                            "type": "integer",
+                            "description": "Winning closes."
+                          },
+                          "losses": {
+                            "type": "integer",
+                            "description": "Losing closes."
+                          },
+                          "trades": {
+                            "type": "integer",
+                            "description": "Closing trades."
+                          },
+                          "winRate": {
+                            "type": "number",
+                            "description": "Win rate, 0 to 100."
+                          },
+                          "longVolume": {
+                            "type": "number",
+                            "description": "Notional traded long."
+                          },
+                          "shortVolume": {
+                            "type": "number",
+                            "description": "Notional traded short."
+                          },
+                          "longRate": {
+                            "type": "number",
+                            "description": "Long share of volume, 0 to 100."
+                          },
+                          "volume": {
+                            "type": "number",
+                            "description": "Total notional traded."
+                          },
+                          "pnl": {
+                            "type": "number",
+                            "description": "Realized PnL on this market."
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/positions/open/{owner}": {
+      "get": {
+        "tags": [
+          "Positions and trades"
+        ],
+        "summary": "List open positions",
+        "description": "What one wallet holds right now, read live from the venue. On Phoenix a wallet can return several rows for one market, one per subaccount.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/platform"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Position id."
+                          },
+                          "owner": {
+                            "type": "string",
+                            "description": "Wallet the position belongs to."
+                          },
+                          "market": {
+                            "type": "object",
+                            "properties": {
+                              "symbol": {
+                                "type": "string",
+                                "description": "Market symbol."
+                              },
+                              "address": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Venue market id or address."
+                              },
+                              "protocol": {
+                                "type": "string",
+                                "description": "Venue, as in the protocol column of Venues and identifiers."
+                              },
+                              "logo": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "Logo URL."
+                              },
+                              "price": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Latest mark price."
+                              },
+                              "market_id": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "description": "Venue market index, where the venue has one."
+                              }
+                            }
+                          },
+                          "side": {
+                            "type": "string",
+                            "description": "Position side, long or short."
+                          },
+                          "size": {
+                            "type": "number",
+                            "description": "Position size in the base asset."
+                          },
+                          "sizeUsd": {
+                            "type": "number",
+                            "description": "Position notional, USD."
+                          },
+                          "collateralUsd": {
+                            "type": [
+                              "number",
+                              "null"
+                            ],
+                            "description": "Collateral backing the position, USD."
+                          },
+                          "leverage": {
+                            "type": [
+                              "number",
+                              "null"
+                            ],
+                            "description": "Effective leverage."
+                          },
+                          "price": {
+                            "type": "number",
+                            "description": "Average entry price."
+                          },
+                          "liquidationPrice": {
+                            "type": [
+                              "number",
+                              "null"
+                            ],
+                            "description": "Estimated liquidation price."
+                          },
+                          "unrealisedPnl": {
+                            "type": "number",
+                            "description": "PnL at the current mark price."
+                          },
+                          "realisedPnl": {
+                            "type": [
+                              "number",
+                              "null"
+                            ],
+                            "description": "PnL already realized on this position."
+                          },
+                          "fundingUsd": {
+                            "type": [
+                              "number",
+                              "null"
+                            ],
+                            "description": "Funding paid or received on the position."
+                          },
+                          "fee": {
+                            "type": [
+                              "number",
+                              "null"
+                            ],
+                            "description": "Fees paid on the position."
+                          },
+                          "marginType": {
+                            "type": "string",
+                            "description": "Margin mode, where the venue reports it.",
+                            "enum": [
+                              "CROSSED",
+                              "ISOLATED"
+                            ]
+                          },
+                          "status": {
+                            "type": "string",
+                            "description": "Always open.",
+                            "enum": [
+                              "open"
+                            ]
+                          }
+                        },
+                        "description": "Open position. Fields a venue does not report are null or absent."
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/positions/trades/{owner}": {
+      "get": {
+        "tags": [
+          "Positions and trades"
+        ],
+        "summary": "List trades",
+        "description": "Every fill of one wallet (`view=trades`), or its positions from open to close (`view=positions`). Paged with `offset` and `limit`; keep going while `hasMore` is true.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/platform"
+          },
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "description": "Fills, or positions grouped from open to close.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "trades",
+                "positions"
+              ],
+              "default": "trades"
+            }
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
+            "description": "Only this market symbol.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "BTC"
+          },
+          {
+            "name": "side",
+            "in": "query",
+            "required": false,
+            "description": "Only this side.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "long",
+                "short"
+              ]
+            }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "description": "Only this fill type. buy and sell on order-book venues; increase, decrease and liquidation on Jupiter.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "buy",
+                "sell",
+                "increase",
+                "decrease",
+                "liquidation"
+              ]
+            }
+          },
+          {
+            "name": "fromDate",
+            "in": "query",
+            "required": false,
+            "description": "From this time (ISO 8601).",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "toDate",
+            "in": "query",
+            "required": false,
+            "description": "Up to this time (ISO 8601).",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "min_position_size_usd",
+            "in": "query",
+            "required": false,
+            "description": "Only fills on positions at least this large.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "max_position_size_usd",
+            "in": "query",
+            "required": false,
+            "description": "Only fills on positions at most this large.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "description": "Sort column.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "block_time",
+                "position_size_usd",
+                "size_usd_delta"
+              ],
+              "default": "block_time"
+            }
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "description": "Sort direction.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Rows per page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 20
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Rows to skip.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "position_key": {
+                                "type": "string",
+                                "description": "Position the fill belongs to."
+                              },
+                              "owner": {
+                                "type": "string",
+                                "description": "Wallet."
+                              },
+                              "action": {
+                                "type": "string",
+                                "description": "Fill type: buy or sell on order-book venues; increase, decrease or liquidation on Jupiter."
+                              },
+                              "token": {
+                                "type": "string",
+                                "description": "Market symbol."
+                              },
+                              "position_side": {
+                                "type": "string",
+                                "description": "Side of the position.",
+                                "enum": [
+                                  "long",
+                                  "short"
+                                ]
+                              },
+                              "price": {
+                                "type": "number",
+                                "description": "Fill price."
+                              },
+                              "size_usd_delta": {
+                                "type": "number",
+                                "description": "Notional of this fill."
+                              },
+                              "position_size_usd": {
+                                "type": "number",
+                                "description": "Position notional after the fill."
+                              },
+                              "pnl_delta": {
+                                "type": "number",
+                                "description": "Realized PnL of this fill before fees."
+                              },
+                              "fee_usd": {
+                                "type": "number",
+                                "description": "Fee of this fill."
+                              },
+                              "liquidation_fee_usd": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Liquidation fee, if the fill was a liquidation."
+                              },
+                              "has_profit": {
+                                "type": [
+                                  "boolean",
+                                  "null"
+                                ],
+                                "description": "Whether the fill realized a profit."
+                              },
+                              "collateral_usd_delta": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Collateral change from this fill."
+                              },
+                              "transfer_amount_usd": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Collateral transferred with this fill."
+                              },
+                              "tx_id": {
+                                "type": "string",
+                                "description": "Transaction hash or venue fill id."
+                              },
+                              "block_time": {
+                                "type": "integer",
+                                "description": "Fill time, Unix seconds."
+                              },
+                              "time": {
+                                "type": "string",
+                                "description": "Fill time, ISO 8601.",
+                                "format": "date-time"
+                              },
+                              "chain": {
+                                "type": "string",
+                                "description": "Chain or venue code."
+                              },
+                              "protocol": {
+                                "type": "string",
+                                "description": "Venue."
+                              }
+                            },
+                            "description": "One fill (view=trades)."
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "cycle_key": {
+                                "type": "string",
+                                "description": "Unique id of the position cycle."
+                              },
+                              "token": {
+                                "type": "string",
+                                "description": "Market symbol."
+                              },
+                              "position_side": {
+                                "type": "string",
+                                "description": "Side.",
+                                "enum": [
+                                  "long",
+                                  "short"
+                                ]
+                              },
+                              "status": {
+                                "type": "string",
+                                "description": "Whether the position is still open.",
+                                "enum": [
+                                  "open",
+                                  "closed"
+                                ]
+                              },
+                              "opened_at": {
+                                "type": "string",
+                                "description": "When the position opened.",
+                                "format": "date-time"
+                              },
+                              "closed_at": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ],
+                                "description": "When it returned to zero.",
+                                "format": "date-time"
+                              },
+                              "entry_price": {
+                                "type": "number",
+                                "description": "Average entry price."
+                              },
+                              "exit_price": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Average exit price."
+                              },
+                              "size_usd": {
+                                "type": "number",
+                                "description": "Peak notional of the position."
+                              },
+                              "realized_pnl": {
+                                "type": "number",
+                                "description": "Realized PnL of the cycle."
+                              },
+                              "fee_usd": {
+                                "type": "number",
+                                "description": "Fees paid in the cycle."
+                              },
+                              "leverage": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Leverage, where the venue reports it."
+                              },
+                              "num_fills": {
+                                "type": "integer",
+                                "description": "Fills in the cycle."
+                              },
+                              "fills_query": {
+                                "type": "object",
+                                "properties": {},
+                                "description": "Parameters to pass back to this endpoint (view=trades) to list the cycle's fills."
+                              }
+                            },
+                            "description": "One position from open to close (view=positions)."
+                          }
+                        ]
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "limit": {
+                          "type": "integer",
+                          "description": "Page size."
+                        },
+                        "offset": {
+                          "type": "integer",
+                          "description": "Rows skipped."
+                        },
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "description": "Total rows, when cheap to count; otherwise null."
+                        },
+                        "hasMore": {
+                          "type": "boolean",
+                          "description": "Whether another page exists."
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/positions/fundings/{owner}": {
+      "get": {
+        "tags": [
+          "Positions and trades"
+        ],
+        "summary": "List deposits and withdrawals",
+        "description": "Money in and out of one wallet with totals. Lighter covers deposits, withdrawals, transfers and vault flows; Phoenix, Bullet and Aftermath cover deposits and withdrawals; RH Lighter and Jupiter return an empty list. Returns 502 when a venue read live does not answer.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/owner"
+          },
+          {
+            "$ref": "#/components/parameters/platform"
+          },
+          {
+            "name": "event_type",
+            "in": "query",
+            "required": false,
+            "description": "Only this event type.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "deposit",
+                "withdraw",
+                "transfer",
+                "vault_mint",
+                "vault_burn"
+              ]
+            }
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "description": "Sort by time.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Rows per page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000,
+              "default": 25
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Rows to skip.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tx_id": {
+                            "type": "string",
+                            "description": "Transaction hash."
+                          },
+                          "event_type": {
+                            "type": "string",
+                            "description": "Event type.",
+                            "enum": [
+                              "deposit",
+                              "withdraw",
+                              "transfer",
+                              "vault_mint",
+                              "vault_burn"
+                            ]
+                          },
+                          "direction": {
+                            "type": "string",
+                            "description": "in or out of the account.",
+                            "enum": [
+                              "in",
+                              "out"
+                            ]
+                          },
+                          "amount": {
+                            "type": "number",
+                            "description": "Amount, USD."
+                          },
+                          "asset": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Asset moved."
+                          },
+                          "counterparty": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Other account of a transfer."
+                          },
+                          "counterparty_name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Known name of the counterparty."
+                          },
+                          "l1_address": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "L1 address of a deposit or withdrawal."
+                          },
+                          "route_type": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Withdrawal route, for example fast or secure."
+                          },
+                          "usdc_fee": {
+                            "type": [
+                              "number",
+                              "null"
+                            ],
+                            "description": "Fee charged by the venue."
+                          },
+                          "block_time": {
+                            "type": "integer",
+                            "description": "Unix seconds."
+                          },
+                          "time": {
+                            "type": "string",
+                            "description": "ISO 8601.",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    },
+                    "summary": {
+                      "type": "object",
+                      "properties": {
+                        "deposit_in": {
+                          "type": "number",
+                          "description": "Total deposited."
+                        },
+                        "withdraw_out": {
+                          "type": "number",
+                          "description": "Total withdrawn."
+                        },
+                        "transfer_in": {
+                          "type": "number",
+                          "description": "Total transferred in."
+                        },
+                        "transfer_out": {
+                          "type": "number",
+                          "description": "Total transferred out."
+                        },
+                        "vault_in": {
+                          "type": "number",
+                          "description": "Total moved into vaults."
+                        },
+                        "vault_out": {
+                          "type": "number",
+                          "description": "Total moved out of vaults."
+                        },
+                        "net": {
+                          "type": "number",
+                          "description": "Net flow."
+                        },
+                        "count": {
+                          "type": "integer",
+                          "description": "Number of events."
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "limit": {
+                          "type": "integer",
+                          "description": "Page size."
+                        },
+                        "offset": {
+                          "type": "integer",
+                          "description": "Rows skipped."
+                        },
+                        "total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "description": "Total rows, when cheap to count; otherwise null."
+                        },
+                        "hasMore": {
+                          "type": "boolean",
+                          "description": "Whether another page exists."
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/cohorts": {
+      "get": {
+        "tags": [
+          "Market"
+        ],
+        "summary": "List cohorts",
+        "description": "Wallets grouped by all-time realized PnL after fees, with how many hold positions and their long and short open interest.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/platform"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "platform": {
+                          "type": "string",
+                          "description": "Venue.",
+                          "enum": [
+                            "LIGHTER",
+                            "RHLT",
+                            "JUPITER",
+                            "PHOENIX",
+                            "BULLET",
+                            "AFTERMATH"
+                          ]
+                        },
+                        "protocol": {
+                          "type": "string",
+                          "description": "Venue as stored."
+                        },
+                        "asOf": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Freshness of the data."
+                        },
+                        "cohorts": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "key": {
+                                "type": "string",
+                                "description": "Cohort key."
+                              },
+                              "title": {
+                                "type": "string",
+                                "description": "Display name."
+                              },
+                              "range": {
+                                "type": "string",
+                                "description": "PnL range as text, for example +$100K to +$1M PNL."
+                              },
+                              "gte": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Lower bound of realized PnL after fees (inclusive)."
+                              },
+                              "lt": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Upper bound (exclusive)."
+                              },
+                              "count": {
+                                "type": "integer",
+                                "description": "Wallets in the cohort."
+                              },
+                              "walletsWithOpen": {
+                                "type": "integer",
+                                "description": "Wallets with at least one open position."
+                              },
+                              "longOiUsd": {
+                                "type": "number",
+                                "description": "Open long notional, USD."
+                              },
+                              "shortOiUsd": {
+                                "type": "number",
+                                "description": "Open short notional, USD."
+                              },
+                              "longPct": {
+                                "type": "number",
+                                "description": "Long share of open interest, 0 to 100."
+                              },
+                              "shortPct": {
+                                "type": "number",
+                                "description": "Short share of open interest, 0 to 100."
+                              },
+                              "sentiment": {
+                                "type": "string",
+                                "description": "Sentiment label from the long share, for example Very Bullish, or No Open Interest."
+                              },
+                              "sentimentVariant": {
+                                "type": "string",
+                                "description": "Sentiment direction, for example positive or neutral."
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/cohorts/{key}": {
+      "get": {
+        "tags": [
+          "Market"
+        ],
+        "summary": "Get a cohort",
+        "description": "One cohort in detail: its open interest per market (top 30) and its biggest wallets by open interest (top 50).",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "description": "Cohort key.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "extremely_profitable",
+                "very_profitable",
+                "profitable",
+                "unprofitable",
+                "very_unprofitable",
+                "rekt"
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/platform"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "platform": {
+                          "type": "string",
+                          "description": "Venue.",
+                          "enum": [
+                            "LIGHTER",
+                            "RHLT",
+                            "JUPITER",
+                            "PHOENIX",
+                            "BULLET",
+                            "AFTERMATH"
+                          ]
+                        },
+                        "asOf": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Freshness of the data."
+                        },
+                        "cohort": {
+                          "type": "object",
+                          "properties": {
+                            "key": {
+                              "type": "string",
+                              "description": "Cohort key."
+                            },
+                            "title": {
+                              "type": "string",
+                              "description": "Display name."
+                            },
+                            "range": {
+                              "type": "string",
+                              "description": "PnL range as text, for example +$100K to +$1M PNL."
+                            },
+                            "gte": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Lower bound of realized PnL after fees (inclusive)."
+                            },
+                            "lt": {
+                              "type": [
+                                "number",
+                                "null"
+                              ],
+                              "description": "Upper bound (exclusive)."
+                            },
+                            "count": {
+                              "type": "integer",
+                              "description": "Wallets in the cohort."
+                            },
+                            "walletsWithOpen": {
+                              "type": "integer",
+                              "description": "Wallets with at least one open position."
+                            },
+                            "longOiUsd": {
+                              "type": "number",
+                              "description": "Open long notional, USD."
+                            },
+                            "shortOiUsd": {
+                              "type": "number",
+                              "description": "Open short notional, USD."
+                            },
+                            "longPct": {
+                              "type": "number",
+                              "description": "Long share of open interest, 0 to 100."
+                            },
+                            "shortPct": {
+                              "type": "number",
+                              "description": "Short share of open interest, 0 to 100."
+                            },
+                            "sentiment": {
+                              "type": "string",
+                              "description": "Sentiment label from the long share, for example Very Bullish, or No Open Interest."
+                            },
+                            "sentimentVariant": {
+                              "type": "string",
+                              "description": "Sentiment direction, for example positive or neutral."
+                            }
+                          }
+                        },
+                        "byAsset": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "symbol": {
+                                "type": "string",
+                                "description": "Market."
+                              },
+                              "longOiUsd": {
+                                "type": "number",
+                                "description": "Open long notional."
+                              },
+                              "shortOiUsd": {
+                                "type": "number",
+                                "description": "Open short notional."
+                              },
+                              "longWallets": {
+                                "type": "integer",
+                                "description": "Wallets long."
+                              },
+                              "shortWallets": {
+                                "type": "integer",
+                                "description": "Wallets short."
+                              },
+                              "netSide": {
+                                "type": "string",
+                                "description": "Which side holds more open interest.",
+                                "enum": [
+                                  "long",
+                                  "short",
+                                  "flat"
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "topWallets": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "owner": {
+                                "type": "string",
+                                "description": "Wallet."
+                              },
+                              "pnl": {
+                                "type": "number",
+                                "description": "All-time realized PnL after fees."
+                              },
+                              "openPositions": {
+                                "type": "integer",
+                                "description": "Open positions."
+                              },
+                              "longOiUsd": {
+                                "type": "number",
+                                "description": "Open long notional."
+                              },
+                              "shortOiUsd": {
+                                "type": "number",
+                                "description": "Open short notional."
+                              },
+                              "netSide": {
+                                "type": "string",
+                                "description": "Which side holds more open interest.",
+                                "enum": [
+                                  "long",
+                                  "short",
+                                  "flat"
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/cohorts/positions": {
+      "get": {
+        "tags": [
+          "Market"
+        ],
+        "summary": "List open positions by cohort",
+        "description": "Open positions across all wallets on a venue, filterable by cohort, wallet, market and side. Paged with `page` and `limit`.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/platform"
+          },
+          {
+            "name": "cohort",
+            "in": "query",
+            "required": false,
+            "description": "Only wallets in this cohort.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "extremely_profitable",
+                "very_profitable",
+                "profitable",
+                "unprofitable",
+                "very_unprofitable",
+                "rekt"
+              ]
+            }
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "required": false,
+            "description": "Only this wallet.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "symbol",
+            "in": "query",
+            "required": false,
+            "description": "Only this market.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "ETH"
+          },
+          {
+            "name": "side",
+            "in": "query",
+            "required": false,
+            "description": "Only this side.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "long",
+                "short"
+              ]
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "description": "Sort column.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "notional_usd",
+                "size",
+                "owner_pnl",
+                "owner"
+              ],
+              "default": "notional_usd"
+            }
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "description": "Sort direction.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "desc"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page, from 1.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Rows per page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "platform": {
+                          "type": "string",
+                          "description": "Venue.",
+                          "enum": [
+                            "LIGHTER",
+                            "RHLT",
+                            "JUPITER",
+                            "PHOENIX",
+                            "BULLET",
+                            "AFTERMATH"
+                          ]
+                        },
+                        "asOf": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Freshness of the data."
+                        },
+                        "rows": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "owner": {
+                                "type": "string",
+                                "description": "Wallet."
+                              },
+                              "marketId": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ],
+                                "description": "Venue market index."
+                              },
+                              "symbol": {
+                                "type": "string",
+                                "description": "Market."
+                              },
+                              "side": {
+                                "type": "string",
+                                "description": "Side.",
+                                "enum": [
+                                  "long",
+                                  "short"
+                                ]
+                              },
+                              "size": {
+                                "type": "number",
+                                "description": "Size in the base asset."
+                              },
+                              "notionalUsd": {
+                                "type": "number",
+                                "description": "Notional, USD: at the latest daily mark where the venue has one, otherwise at entry."
+                              },
+                              "entryPrice": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Entry price, where known."
+                              },
+                              "markPrice": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Mark price used."
+                              },
+                              "ownerPnl": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "All-time realized PnL after fees of the wallet."
+                              }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "page": {
+                              "type": "integer",
+                              "description": "Current page."
+                            },
+                            "limit": {
+                              "type": "integer",
+                              "description": "Rows per page."
+                            },
+                            "total": {
+                              "type": "integer",
+                              "description": "Matching rows."
+                            },
+                            "totalPages": {
+                              "type": "integer",
+                              "description": "Pages."
+                            },
+                            "hasMore": {
+                              "type": "boolean",
+                              "description": "Whether another page exists."
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/markets": {
+      "get": {
+        "tags": [
+          "Market"
+        ],
+        "summary": "List markets",
+        "description": "The perpetual markets of a venue. Use `symbol` to filter other endpoints by market.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/platform"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "symbol": {
+                            "type": "string",
+                            "description": "Market symbol, for example BTC."
+                          },
+                          "value": {
+                            "type": "string",
+                            "description": "Venue's own market name."
+                          },
+                          "logo": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Logo URL."
+                          },
+                          "market_id": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ],
+                            "description": "Venue market index, where the venue has one."
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/perps-war": {
+      "get": {
+        "tags": [
+          "Market"
+        ],
+        "summary": "Compare venues",
+        "description": "Every venue ranked over the last 7 complete UTC days against the 7 before: volume, traders, retention, open interest, fees and concentration, with 14 days of daily volume. Sorted by volume. Fills on order-book venues are counted once, so volumes compare fairly.\n\nThis endpoint takes no parameters.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success"
+                      ]
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "periodStart": {
+                          "type": "string",
+                          "description": "First day of the window.",
+                          "format": "date"
+                        },
+                        "periodEnd": {
+                          "type": "string",
+                          "description": "Last day of the window.",
+                          "format": "date"
+                        },
+                        "oiAsOf": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "When open interest was read.",
+                          "format": "date-time"
+                        },
+                        "venues": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "platform": {
+                                "type": "string",
+                                "description": "Venue.",
+                                "enum": [
+                                  "LIGHTER",
+                                  "RHLT",
+                                  "JUPITER",
+                                  "PHOENIX",
+                                  "BULLET",
+                                  "AFTERMATH"
+                                ]
+                              },
+                              "label": {
+                                "type": "string",
+                                "description": "Display name."
+                              },
+                              "volumeUsd": {
+                                "type": "number",
+                                "description": "Volume in the last 7 days, each fill counted once."
+                              },
+                              "prevVolumeUsd": {
+                                "type": "number",
+                                "description": "Volume in the 7 days before."
+                              },
+                              "volumeChangePct": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Change in volume, percent."
+                              },
+                              "volumeSharePct": {
+                                "type": "number",
+                                "description": "Share of total volume across venues, percent."
+                              },
+                              "trades": {
+                                "type": "integer",
+                                "description": "Fills, each counted once."
+                              },
+                              "traders": {
+                                "type": "integer",
+                                "description": "Wallets that traded."
+                              },
+                              "prevTraders": {
+                                "type": "integer",
+                                "description": "Wallets that traded in the 7 days before."
+                              },
+                              "tradersChangePct": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Change in traders, percent."
+                              },
+                              "avgDailyTraders": {
+                                "type": "number",
+                                "description": "Average wallets trading per day."
+                              },
+                              "newTraders": {
+                                "type": "integer",
+                                "description": "Wallets trading on the venue for the first time."
+                              },
+                              "retainedPct": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Share of the previous week's traders who traded again, percent."
+                              },
+                              "avgActiveDays": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Average active days per trader."
+                              },
+                              "top10Pct": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Share of volume from the 10 biggest wallets, percent."
+                              },
+                              "medianWalletVolumeUsd": {
+                                "type": "number",
+                                "description": "Median volume per trader."
+                              },
+                              "feesUsd": {
+                                "type": "number",
+                                "description": "Trading fees paid."
+                              },
+                              "feeToVolumeBps": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Fees over volume, basis points."
+                              },
+                              "oiUsd": {
+                                "type": "number",
+                                "description": "Open interest now, one side."
+                              },
+                              "oiHolders": {
+                                "type": "integer",
+                                "description": "Wallets with an open position."
+                              },
+                              "weeklyVolumeToOi": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ],
+                                "description": "Weekly volume divided by open interest."
+                              },
+                              "daily": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "day": {
+                                      "type": "string",
+                                      "description": "Day (UTC).",
+                                      "format": "date"
+                                    },
+                                    "volumeUsd": {
+                                      "type": "number",
+                                      "description": "Volume that day."
+                                    },
+                                    "traders": {
+                                      "type": "integer",
+                                      "description": "Wallets that traded that day."
+                                    }
+                                  }
+                                },
+                                "description": "14 days of daily volume and traders."
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "data"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "Your API key. Keys are issued on request: message @perp_ag on X."
+      }
+    },
+    "parameters": {
+      "platform": {
+        "name": "platform",
+        "in": "query",
+        "required": true,
+        "description": "Venue. See Venues and identifiers.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "LIGHTER",
+            "RHLT",
+            "JUPITER",
+            "PHOENIX",
+            "BULLET",
+            "AFTERMATH"
+          ]
+        },
+        "example": "LIGHTER"
+      },
+      "owner": {
+        "name": "owner",
+        "in": "path",
+        "required": true,
+        "description": "The wallet: an account index on Lighter and RH Lighter, a Solana address on Jupiter, Phoenix and Bullet, an account object id (0x + 64 hex) on Aftermath.",
+        "schema": {
+          "type": "string"
+        },
+        "example": "35346"
+      },
+      "range": {
+        "name": "range",
+        "in": "query",
+        "required": false,
+        "description": "Time range. 1M is 30 days, 3M 90 days, 1Y 365 days.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "7D",
+            "1M",
+            "3M",
+            "1Y",
+            "YTD",
+            "ALL"
+          ],
+          "default": "ALL"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Missing or invalid parameter.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "error"
+                  ]
+                },
+                "message": {
+                  "type": "string",
+                  "description": "What is wrong."
+                },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {}
+                  },
+                  "description": "Invalid parameters, for validation errors."
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Missing or invalid API key.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Rate limit exceeded.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Too many requests. Please wait for a moment."
+                }
+              }
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Unknown resource.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "error"
+                  ]
+                },
+                "message": {
+                  "type": "string",
+                  "description": "What was not found."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

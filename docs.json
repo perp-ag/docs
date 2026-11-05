@@ -1,46 +1,209 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Perp.ag Documentation",
+  "theme": "linden",
+  "name": "Perp.ag Docs",
+  "description": "Guide to the Perp.ag app and documentation for the Perp.ag Data API: trader analytics for Lighter, RH Lighter, Jupiter, Phoenix, Bullet and Aftermath.",
   "colors": {
-    "primary": "#4f46e5",
-    "light": "#4f46e5",
-    "dark": "#4f46e5"
+    "primary": "#38a67c",
+    "light": "#38a67c",
+    "dark": "#2a7d5d"
   },
-  "favicon": "/logo.png",
+  "background": {
+    "color": {
+      "dark": "#141210"
+    }
+  },
+  "appearance": {
+    "default": "dark"
+  },
+  "fonts": {
+    "heading": {
+      "family": "Space Grotesk",
+      "weight": 600
+    },
+    "body": {
+      "family": "Inter"
+    }
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "href": "https://perp.ag"
+  },
+  "favicon": "/favicon.svg",
+  "navbar": {
+    "primary": {
+      "type": "button",
+      "label": "Open app",
+      "href": "https://app.perp.ag"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Guide",
+        "icon": "book-open",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "Get started",
             "pages": [
-              "overview",
-              "getting-started",
-              "how-to-copy-trade",
-              "referrals"
+              "index",
+              "quickstart",
+              "venues"
+            ]
+          },
+          {
+            "group": "Find traders",
+            "pages": [
+              "guide/explore",
+              "guide/trader-profile",
+              "guide/copy-score"
+            ]
+          },
+          {
+            "group": "Test before you fund",
+            "pages": [
+              "guide/backtest",
+              "guide/paper-copy"
+            ]
+          },
+          {
+            "group": "Copy trading",
+            "pages": [
+              "guide/copy-trading",
+              "guide/cross-venue-copy",
+              "guide/fund-protection"
+            ]
+          },
+          {
+            "group": "Your account",
+            "pages": [
+              "guide/accounts",
+              "guide/login-and-alerts",
+              "guide/rewards",
+              "guide/perps-war"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "guide/faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API",
+        "icon": "database",
+        "groups": [
+          {
+            "group": "Data API",
+            "pages": [
+              "api/overview",
+              "api/get-access",
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Working with the API",
+            "pages": [
+              "api/venues-and-identifiers",
+              "api/conventions",
+              "api/errors-and-limits"
+            ]
+          },
+          {
+            "group": "Data dictionary",
+            "pages": [
+              "api/metrics",
+              "api/coverage"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "icon": "code",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Traders",
+            "pages": [
+              "api-reference/endpoint/get-wallet-discover",
+              "api-reference/endpoint/get-wallet-count",
+              "api-reference/endpoint/get-wallet-copy-score-owner"
+            ]
+          },
+          {
+            "group": "Wallet analytics",
+            "pages": [
+              "api-reference/endpoint/get-positions-overview-owner",
+              "api-reference/endpoint/get-positions-analytics-owner",
+              "api-reference/endpoint/get-positions-equity-owner",
+              "api-reference/endpoint/get-positions-asset-performance-owner"
+            ]
+          },
+          {
+            "group": "Positions and trades",
+            "pages": [
+              "api-reference/endpoint/get-positions-open-owner",
+              "api-reference/endpoint/get-positions-trades-owner",
+              "api-reference/endpoint/get-positions-fundings-owner"
+            ]
+          },
+          {
+            "group": "Market",
+            "pages": [
+              "api-reference/endpoint/get-cohorts",
+              "api-reference/endpoint/get-cohorts-key",
+              "api-reference/endpoint/get-cohorts-positions",
+              "api-reference/endpoint/get-markets",
+              "api-reference/endpoint/get-perps-war"
             ]
           }
         ]
       }
     ]
   },
-  "logo": {
-    "light": "/logo/logo.png",
-    "dark": "/logo/logo.png"
-  },
-  "navbar": {
-    "primary": {
-      "type": "button",
-      "label": "Trade Now",
-      "href": "https://app.perp.ag/"
+  "api": {
+    "playground": {
+      "display": "simple"
+    },
+    "examples": {
+      "languages": [
+        "bash",
+        "javascript",
+        "python"
+      ]
     }
   },
   "footer": {
     "socials": {
-      "twitter": "https://x.com/perp_ag",
-      "github": "https://github.com/perp-ag"
+      "x": "https://x.com/perp_ag",
+      "website": "https://perp.ag"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/overview",
+      "destination": "/"
+    },
+    {
+      "source": "/getting-started",
+      "destination": "/quickstart"
+    },
+    {
+      "source": "/how-to-copy-trade",
+      "destination": "/guide/copy-trading"
+    },
+    {
+      "source": "/referrals",
+      "destination": "/guide/rewards"
+    }
+  ]
 }

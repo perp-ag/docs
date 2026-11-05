@@ -1,0 +1,33 @@
+---
+title: "Coverage"
+description: "Which data is available for which venue, and since when."
+---
+
+## Endpoint support by venue
+
+| Endpoint | Lighter | RH Lighter | Jupiter | Phoenix | Bullet | Aftermath |
+| --- | --- | --- | --- | --- | --- | --- |
+| `/wallet/discover`, `/wallet/count` | Yes | Yes | Yes | Yes | Yes | Yes |
+| `/wallet/copy-score/{owner}` | Yes | Yes | Yes | Yes | Yes | Yes |
+| `/positions/overview/{owner}` | Yes | Yes | Yes | Yes | Yes | Yes |
+| `/positions/analytics/{owner}` | Yes | Yes | Yes | Yes | Yes | Yes |
+| `/positions/equity/{owner}` | Yes | Yes | Yes | Yes | Realized only | Yes |
+| `/positions/asset-performance/{owner}` | Yes | Yes | Yes | Yes | Yes | Yes |
+| `/positions/open/{owner}` | Yes | Yes | Yes | Yes | Yes | Yes |
+| `/positions/trades/{owner}` | Yes | Yes | Yes | Yes | Yes | Yes |
+| `/positions/fundings/{owner}` | Yes | No | No | Deposits and withdrawals | Deposits and withdrawals | Deposits and withdrawals |
+| `/cohorts`, `/cohorts/{key}`, `/cohorts/positions` | Yes | Yes | Yes | Yes | Yes | Yes |
+| `/markets` | Yes | Yes | Yes | Yes | Yes | Yes |
+| `/perps-war` | All venues in one response |
+
+## History
+
+- **Lighter** trade history starts on **30 August 2025**. Wallets that traded before then can have incomplete
+  early history, so their all-time numbers start from that date.
+- The **equity curve** (`/positions/equity`) starts no earlier than **1 January 2026**; its realized line still
+  carries the full lifetime total from before that date.
+- The **Copy Score** only uses the last 90 days.
+
+## Perpetuals only
+
+Analytics cover perpetual futures. Spot trades on venues that also list spot markets are excluded.

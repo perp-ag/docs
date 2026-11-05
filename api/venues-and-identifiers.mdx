@@ -1,0 +1,48 @@
+---
+title: "Venues and identifiers"
+description: "Choose a venue with platform, and identify a wallet with owner."
+---
+
+## The platform parameter
+
+Every endpoint is scoped to one venue. Pass it as the `platform` query parameter.
+
+| `platform` | Venue | `protocol` in responses | Chain |
+| --- | --- | --- | --- |
+| `LIGHTER` | Lighter | `LIGHTER` | Lighter (Ethereum L2) |
+| `RHLT` | RH Lighter (Lighter on Robinhood Chain) | `RHLT` | Robinhood Chain |
+| `JUPITER` | Jupiter Perps | `JUPPERP` | Solana |
+| `PHOENIX` | Phoenix | `PHOENIX` | Solana |
+| `BULLET` | Bullet | `BULLET` | Solana |
+| `AFTERMATH` | Aftermath | `AFTERMATH` | Sui |
+
+Send one of the values above, in upper case.
+
+<Warning>
+  Always send `platform`. Some endpoints fall back to a default venue when it is missing, and the default is not
+  the same everywhere.
+</Warning>
+
+## The owner identifier
+
+Endpoints about one wallet take it as the `{owner}` path parameter. Its format depends on the venue:
+
+| Venue | `owner` is |
+| --- | --- |
+| Lighter | The account index, a number such as `35346` |
+| RH Lighter | The account index on RH Lighter (its own numbering, separate from Lighter) |
+| Jupiter | The Solana wallet address (base58) |
+| Phoenix | The Solana wallet address (base58) |
+| Bullet | The Solana wallet address (base58) |
+| Aftermath | The Aftermath account object id on Sui: `0x` followed by 64 hex characters |
+
+<Note>
+  On Lighter and RH Lighter a single Ethereum address can own several accounts (a main account and subaccounts),
+  each with its own index. The API works per account index.
+</Note>
+
+## Markets
+
+Market symbols in responses are the venue's base asset, for example `BTC`, `ETH` or `SOL`. Use
+[`GET /markets`](/api-reference/endpoint/get-markets) to list the markets of a venue. Analytics cover perpetual
+markets only; spot markets are excluded.

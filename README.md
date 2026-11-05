@@ -1,18 +1,22 @@
+# Perp.ag docs
 
+Source for https://docs.perp.ag, built and hosted by Mintlify.
 
+- **Guide**: what Perp.ag is, its features and how to use them, with screenshots from the app.
+- **API**: the Perp.ag Data API (access by key, on request).
+- **API Reference**: generated from `api-reference/openapi.json`.
 
-# Perp.ag Documentation
+The source of truth is `landing-page/docs` in `getnimbus/perp_ag`; this repo mirrors it.
 
-Welcome to the official documentation for [Perp.ag](https://perp.ag) — Solana Perpetual Copy Trading.
+## Preview locally
 
-Perp.ag is a blockchain platform that helps users discover and copy top-performing wallets trading perpetuals on Jupiter Perp. Effortlessly follow the best traders and automate your trading strategy.
+```bash
+npx mint dev
+```
 
-- Website: https://perp.ag
-- Blockchain: Solana
-- Product: Perpetual Copy Trading
+Check before pushing:
 
-## Documentation
-
-- [Introduction](index.mdx)
-- [Quickstart](quickstart.mdx)
-- [Development](development.mdx)
+```bash
+npx mint validate
+npx mint broken-links
+```

@@ -1,0 +1,37 @@
+---
+title: "Backtest"
+description: "Replay a trader's past positions against your own settings."
+---
+
+A backtest answers: *if I had copied this wallet with these settings, what would have happened to my
+account?* It replays the wallet's past positions at your size and charges fees and slippage on every trade.
+
+## Run a backtest
+
+<Steps>
+  <Step title="Open the trader's profile">
+    Find the wallet in [Explore](/guide/explore) and open it.
+  </Step>
+  <Step title="Click Backtest">
+    The backtest uses the profile's selected range (7D to ALL).
+  </Step>
+  <Step title="Set your inputs">
+    | Input | Meaning |
+    | --- | --- |
+    | **Starting capital ($)** | The balance you would start with. |
+    | **Copy %** | The share of each of the trader's positions you would take. |
+    | **Max per-trade ($)** | A cap on any single copied position. |
+    | **Markets** and **Sides** | Copy only some markets, or only longs or shorts. |
+    | **Taker fee %** and **Slippage %** (Advanced) | The cost charged on every simulated fill. |
+  </Step>
+  <Step title="Read the result">
+    **Final Value**, **ROI**, **Max Drawdown**, **Win Rate**, **Trades Copied**, **Total Fees** and an equity
+    curve of your simulated account.
+  </Step>
+</Steps>
+
+<Note>
+  A backtest assumes you got the trader's prices plus the slippage you set. Real copies fill a little after
+  the trader, so live results trail a backtest. Use [paper copy](/guide/paper-copy) to measure that gap on live
+  markets before you commit money.
+</Note>

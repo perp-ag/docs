@@ -1,0 +1,74 @@
+---
+title: "Conventions"
+description: "Response envelope, pagination, time ranges and units."
+---
+
+## Response envelope
+
+A successful response wraps its payload in `data`:
+
+```json
+{
+  "status": "success",
+  "data": { }
+}
+```
+
+List endpoints that page add a `pagination` object next to `data`, and some add a `summary`.
+
+## Pagination
+
+Two styles are used, depending on the endpoint. Each endpoint's reference page says which.
+
+<Tabs>
+  <Tab title="Page and limit">
+    Used by [`/wallet/discover`](/api-reference/endpoint/get-wallet-discover) and
+    [`/cohorts/positions`](/api-reference/endpoint/get-cohorts-positions). Send `page` (starting at 1) and
+    `limit`. The response tells you how many pages there are:
+
+    ```json
+    "pagination": { "currentPage": 1, "totalPages": 42, "totalCount": 4180, "pageSize": 100 }
+    ```
+  </Tab>
+  <Tab title="Offset and limit">
+    Used by [`/positions/trades`](/api-reference/endpoint/get-positions-trades-owner) and
+    [`/positions/fundings`](/api-reference/endpoint/get-positions-fundings-owner). Send `offset` and `limit`
+    (up to 1000). Keep going while `hasMore` is `true`; `total` can be `null` because counting every row is
+    expensive on large wallets.
+
+    ```json
+    "pagination": { "limit": 100, "offset": 0, "total": null, "hasMore": true }
+    ```
+  </Tab>
+</Tabs>
+
+## Time ranges
+
+Wallet analytics take a `range`:
+
+| `range` | Window |
+| --- | --- |
+| `7D` | Last 7 days |
+| `1M` | Last 30 days |
+| `3M` | Last 90 days |
+| `1Y` | Last 365 days |
+| `YTD` | Since 1 January (UTC) |
+| `ALL` | All history we have |
+
+Leaderboard metrics come pre-computed in three windows, named by prefix: `7d_`, `30d_` and `total_` (all time).
+
+## Units and formats
+
+- **Money** is in **USD** as a number (for example `1523.42`), whatever the venue settles in.
+- **Ratios** such as `win_rate` and `drawdown` are fractions (`0.62` is 62%). Fields that are already
+  percentages say so in their description, for example `winRate` in asset performance (0 to 100).
+- **Dates** are UTC. Daily series use `YYYY-MM-DD`; timestamps are ISO 8601 or Unix seconds, as named
+  (`block_time` is Unix seconds, `time` is ISO 8601).
+- **Sides** are `long` and `short`.
+
+## Freshness and caching
+
+Analytics are updated continuously from each venue's trade stream and cached for a short time: most wallet
+endpoints for 1 to 5 minutes, leaderboards for 10 minutes, venue rankings for a few hours. Leaderboard and cohort
+responses carry an `asOf` timestamp telling you how fresh the underlying data is. There is no benefit to polling
+faster than the cache.

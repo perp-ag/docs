@@ -1,0 +1,77 @@
+---
+title: "Metrics"
+description: "What each number in the API means and how it is computed."
+---
+
+## PnL
+
+PnL is computed per wallet from every fill, with the **adjusted-entry** method: opening or adding to a position
+raises its entry value and size; closing part of it realizes PnL on the closed share and reduces the entry value
+in proportion; the cycle resets when the position returns to zero.
+
+| Metric | Meaning |
+| --- | --- |
+| `pnl_delta` / `pnl` | Realized PnL before fees. |
+| `fee_usd` | Trading fees paid. |
+| `pnl_after_fee` | Realized PnL after fees. The number to use for "did this wallet make money". |
+| `profit` / `total_profit` | Sum of winning closes. |
+| `total_loss` | Sum of losing closes (negative). |
+| `unrealized_pnl` | PnL of positions still open, at the latest mark price. |
+| `total_equity` | Cumulative realized PnL after fees plus unrealized PnL. |
+
+## Performance
+
+| Metric | Meaning |
+| --- | --- |
+| `trades` | Number of closing trades in the window. |
+| `win_rate` | Share of closing trades with a non-zero result that made money, as a fraction: `0.62` is 62%. |
+| `expected_value` | Expected PnL per closing trade: win rate times the average win, plus loss rate times the average loss. |
+| `max_drawdown` / `drawdown` | Deepest fall of cumulative PnL after fees from its running peak, relative to that peak, as a fraction from `-1` to `0`: `-0.25` is a 25% drawdown. |
+| `pnl_ratio` | Profit factor: total profit divided by the absolute total loss. |
+| `volume` | Traded notional (size times price), counting each open and each close. |
+| `avg_trade_size` | Volume divided by trades. |
+| `long_pnl`, `short_pnl`, `long_volume`, `short_volume` | The same, split by position side. |
+
+Leaderboard windows: `7d_` is the last 7 days including today, `30d_` the last 30, `total_` all history. Profile
+ranges map the same way (`1M` is 30 days, `3M` is 90 days, `1Y` is 365 days).
+
+## Copy Score
+
+A 0 to 100 rating of how suitable a wallet is to copy. It is computed over the **last 90 days**.
+
+| Field | Meaning |
+| --- | --- |
+| `score` | The Copy Score. `null` when the wallet is not eligible. |
+| `tier` | `S` (top 1% of scored wallets), `A` (next 4%), `B` (next 15%), `C` (next 30%), `D` (bottom 50%). |
+| `eligibilityReason` | Why there is no score: `insufficient_history` (fewer than 20 trades or 10 active days) or `dormant` (no trade in the last 7 days). `null` when scored. |
+| `perf` | Performance part of the score, from `sharpe`, `drawdown`, `consistency` and net PnL, weighted 0.45, 0.25, 0.20 and 0.10. |
+| `sharpe` | Profit earned per unit of volatility, ranked against all eligible wallets. |
+| `drawdown` | Drawdown score: higher means shallower drawdowns. |
+| `consistency` | Win rate and profit factor combined. |
+| `copyability` | How practical the wallet is to mirror, from `frequency` and `sizing`. |
+| `frequency` | Lower when the wallet trades very often (hard to copy in time). |
+| `sizing` | Lower when position sizes vary a lot (hard to copy in proportion). |
+| `confidence` | How much trade history backs the score. Thin history pulls the score toward 50. |
+| `directionBias`, `directionBiasLabel` | Share of positions that are long, and its label: `Long-only`, `Long-biased`, `Balanced`, `Short-biased`, `Short-only`. |
+| `directionEdge` | Which side the wallet makes money on: `Bull specialist`, `Bear specialist` or `Two-sided`. |
+
+Liquidations lower the score.
+
+## Cohorts
+
+Wallets grouped by all-time realized PnL after fees:
+
+| `key` | Range |
+| --- | --- |
+| `extremely_profitable` | +$1M or more |
+| `very_profitable` | +$100K to +$1M |
+| `profitable` | $0 to +$100K |
+| `unprofitable` | $0 to -$100K |
+| `very_unprofitable` | -$100K to -$1M |
+| `rekt` | -$1M or worse |
+
+## Venue rankings
+
+Order-book venues report each fill once per side. In [`/perps-war`](/api-reference/endpoint/get-perps-war),
+`volumeUsd` and `trades` count each fill **once** on every venue so venues compare fairly, and `oiUsd` is
+**one-sided** open interest.
