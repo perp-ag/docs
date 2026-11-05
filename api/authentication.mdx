@@ -1,0 +1,51 @@
+---
+title: "Authentication"
+description: "Send your API key in the x-api-key header."
+---
+
+Every request must carry your API key in the `x-api-key` header.
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.reperp.xyz/api/v1/wallet/copy-score/35346?platform=LIGHTER" \
+  -H "x-api-key: $PERP_AG_API_KEY"
+```
+
+```javascript JavaScript
+const res = await fetch(
+  "https://api.reperp.xyz/api/v1/wallet/copy-score/35346?platform=LIGHTER",
+  { headers: { "x-api-key": process.env.PERP_AG_API_KEY } },
+);
+const { data } = await res.json();
+console.log(data.score, data.tier);
+```
+
+```python Python
+import os
+import requests
+
+res = requests.get(
+    "https://api.reperp.xyz/api/v1/wallet/copy-score/35346",
+    params={"platform": "LIGHTER"},
+    headers={"x-api-key": os.environ["PERP_AG_API_KEY"]},
+    timeout=30,
+)
+res.raise_for_status()
+data = res.json()["data"]
+print(data["score"], data["tier"])
+```
+
+</CodeGroup>
+
+A request without a valid key gets `401`:
+
+```json
+{ "error": "Unauthorized" }
+```
+
+## Keep your key secret
+
+- Call the API from your server, never from a browser or a mobile app where the key can be read.
+- Keep the key in an environment variable or a secret manager, not in source control.
+- If a key leaks, [tell us](https://x.com/perp_ag) and we will revoke it and issue a new one.

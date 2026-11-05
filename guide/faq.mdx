@@ -1,0 +1,40 @@
+---
+title: "FAQ"
+description: "Common questions about Perp.ag."
+---
+
+<AccordionGroup>
+  <Accordion title="Does Perp.ag hold my funds?">
+    No. Copies trade in your own accounts on each venue, and you can export each account's key from
+    [Accounts](/guide/accounts) at any time.
+  </Accordion>
+  <Accordion title="Why is my result different from the trader's?">
+    A copy fills shortly after the trader, at the price available then, and pays its own fees. Size caps,
+    leverage limits, markets and sides you excluded, and trades skipped for slippage also change the outcome.
+    **Trade Logs** shows every copied order, and a [paper copy](/guide/paper-copy) shows the leader trades it did
+    not copy and why.
+  </Accordion>
+  <Accordion title="What happens to my positions when I stop a copy?">
+    Nothing. Pausing or unfollowing stops new copied trades; positions the copy already opened stay in your
+    account for you to manage.
+  </Accordion>
+  <Accordion title="Can I copy more than one trader?">
+    Yes, with one trader per account. Create a subaccount for each trader you want to copy, so each copy has its
+    own balance and its own [Fund protection](/guide/fund-protection).
+  </Accordion>
+  <Accordion title="Can I trade by hand on an account that copies?">
+    You can, but the copy and your own trades share the same positions on a market, and **Force-flatten** fund
+    protection closes everything. Use a separate account for manual trading.
+  </Accordion>
+  <Accordion title="How far back does trader history go?">
+    Lighter history starts on 30 August 2025, so wallets older than that can have incomplete early history.
+    The Copy Score only uses the last 90 days.
+  </Accordion>
+  <Accordion title="Is Perp.ag open to everyone?">
+    Not yet. Perp.ag is in private testing while we harden copy execution against live markets. Follow
+    [@perp_ag on X](https://x.com/perp_ag) for the public launch.
+  </Accordion>
+  <Accordion title="Can I use Perp.ag data in my own product?">
+    Yes. See the [Data API](/api/overview).
+  </Accordion>
+</AccordionGroup>

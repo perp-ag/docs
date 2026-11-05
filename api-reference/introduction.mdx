@@ -1,0 +1,37 @@
+---
+title: "API Reference"
+description: "Every endpoint of the Perp.ag Data API."
+---
+
+All endpoints are `GET` requests under one base URL, and all need your API key.
+
+```text
+https://api.reperp.xyz/api/v1
+```
+
+| | |
+| --- | --- |
+| **Auth** | `x-api-key: <your key>` header. [Get a key](/api/get-access). |
+| **Venue** | `platform` query parameter on every endpoint except `/perps-war`. [Values](/api/venues-and-identifiers). |
+| **Wallet** | `{owner}` path parameter, in the venue's format. [Formats](/api/venues-and-identifiers#the-owner-identifier). |
+| **Response** | `{"status": "success", "data": ...}`. [Conventions](/api/conventions). |
+
+## Endpoints
+
+| Endpoint | What it returns |
+| --- | --- |
+| [`GET /wallet/discover`](/api-reference/endpoint/get-wallet-discover) | The leaderboard, filtered and sorted |
+| [`GET /wallet/count`](/api-reference/endpoint/get-wallet-count) | How many wallets match a set of filters |
+| [`GET /wallet/copy-score/{owner}`](/api-reference/endpoint/get-wallet-copy-score-owner) | A wallet's Copy Score |
+| [`GET /positions/overview/{owner}`](/api-reference/endpoint/get-positions-overview-owner) | A wallet's headline metrics for every range |
+| [`GET /positions/analytics/{owner}`](/api-reference/endpoint/get-positions-analytics-owner) | A wallet's realized PnL over time |
+| [`GET /positions/equity/{owner}`](/api-reference/endpoint/get-positions-equity-owner) | A wallet's daily equity curve |
+| [`GET /positions/asset-performance/{owner}`](/api-reference/endpoint/get-positions-asset-performance-owner) | A wallet's results per market |
+| [`GET /positions/open/{owner}`](/api-reference/endpoint/get-positions-open-owner) | A wallet's open positions |
+| [`GET /positions/trades/{owner}`](/api-reference/endpoint/get-positions-trades-owner) | A wallet's fills, or its positions from open to close |
+| [`GET /positions/fundings/{owner}`](/api-reference/endpoint/get-positions-fundings-owner) | A wallet's deposits and withdrawals |
+| [`GET /cohorts`](/api-reference/endpoint/get-cohorts) | Wallets grouped by PnL, with open interest |
+| [`GET /cohorts/{key}`](/api-reference/endpoint/get-cohorts-key) | One cohort by market and top wallets |
+| [`GET /cohorts/positions`](/api-reference/endpoint/get-cohorts-positions) | Open positions across a venue |
+| [`GET /markets`](/api-reference/endpoint/get-markets) | A venue's markets |
+| [`GET /perps-war`](/api-reference/endpoint/get-perps-war) | Every venue compared over 7 days |

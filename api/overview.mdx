@@ -1,0 +1,54 @@
+---
+title: "Data API"
+description: "Trader analytics for six perp venues, the same data that powers Perp.ag."
+---
+
+The Perp.ag Data API gives you the analytics behind the app: every perp wallet we track on **Lighter, RH Lighter,
+Jupiter, Phoenix, Bullet and Aftermath**, scored, ranked and broken down. If you are building a trading tool, a
+dashboard, a research report or a bot, you can use the same numbers we use.
+
+<Info>
+  Access is by API key, issued on request. [Contact us](/api/get-access) to get one.
+</Info>
+
+## What you can get
+
+<CardGroup cols={2}>
+  <Card title="Leaderboards" icon="ranking-star" href="/api-reference/endpoint/get-wallet-discover">
+    Rank and filter wallets by Copy Score, PnL, win rate, volume, drawdown, bias and edge.
+  </Card>
+  <Card title="Copy Score" icon="gauge" href="/api/metrics">
+    A 0 to 100 score with tier and sub-scores for every eligible wallet.
+  </Card>
+  <Card title="Wallet analytics" icon="chart-line" href="/api-reference/endpoint/get-positions-overview-owner">
+    PnL, volume, win rate, drawdown and fees over 7D to all time; daily PnL and equity curves; per-market performance.
+  </Card>
+  <Card title="Positions and trades" icon="list" href="/api-reference/endpoint/get-positions-trades-owner">
+    Open positions, every fill, positions grouped from open to close, deposits and withdrawals.
+  </Card>
+  <Card title="Cohorts" icon="users" href="/api-reference/endpoint/get-cohorts">
+    Wallets grouped by realized PnL, with their long and short open interest per market.
+  </Card>
+  <Card title="Venue rankings" icon="trophy" href="/api-reference/endpoint/get-perps-war">
+    Volume, traders, open interest, fees and growth for every venue over the last 7 days.
+  </Card>
+</CardGroup>
+
+## At a glance
+
+| | |
+| --- | --- |
+| **Base URL** | `https://api.reperp.xyz/api/v1` |
+| **Format** | JSON over HTTPS, gzip-compressed |
+| **Auth** | `x-api-key` header. See [Authentication](/api/authentication). |
+| **Venue** | `platform` query parameter: `LIGHTER`, `RHLT`, `JUPITER`, `PHOENIX`, `BULLET`, `AFTERMATH`. See [Venues and identifiers](/api/venues-and-identifiers). |
+| **Rate limit** | 60 requests per minute by default. See [Errors and limits](/api/errors-and-limits). |
+
+## A first request
+
+```bash
+curl "https://api.reperp.xyz/api/v1/wallet/discover?platform=LIGHTER&sort_by=copy_score&copy_score_tier=S&limit=10" \
+  -H "x-api-key: $PERP_AG_API_KEY"
+```
+
+This returns the ten best S-tier Lighter wallets by Copy Score, with their 7D, 30D and all-time metrics.

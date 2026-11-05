@@ -1,0 +1,42 @@
+---
+title: "Errors and limits"
+description: "Status codes, error bodies and rate limits."
+---
+
+## Errors
+
+Errors use standard HTTP status codes and a JSON body.
+
+| Status | Meaning | Body |
+| --- | --- | --- |
+| `400` | A parameter is missing or invalid, for example an unsupported `platform` or a malformed `owner` | `{"status": "error", "message": "..."}` |
+| `401` | Missing or invalid API key | `{"error": "Unauthorized"}` |
+| `404` | Unknown resource, for example an unknown cohort key | `{"status": "error", "message": "..."}` |
+| `429` | Rate limit exceeded | `{"error": "Too many requests. Please wait for a moment."}` |
+| `500` | Something failed on our side | `{"status": "error", "message": "..."}` |
+| `502` | A venue we read live (for example its deposit history) did not answer | `{"status": "error", "message": "..."}` |
+
+Validation errors can include an `errors` array listing each invalid parameter.
+
+<Tip>
+  Retry `429`, `500` and `502` with exponential backoff. Do not retry `400` or `401` without fixing the request.
+</Tip>
+
+## Rate limits
+
+The default limit is **60 requests per minute**. If you need more, [ask us](/api/get-access).
+
+Every response carries the standard rate-limit headers, so you can pace yourself before you hit the limit:
+
+| Header | Meaning |
+| --- | --- |
+| `RateLimit-Limit` | Requests allowed in the window |
+| `RateLimit-Remaining` | Requests left in the current window |
+| `RateLimit-Reset` | Seconds until the window resets |
+
+## Good practice
+
+- Cache responses on your side. Most data changes on a scale of minutes, see
+  [freshness](/api/conventions#freshness-and-caching).
+- Ask for the page size you need. Large leaderboard pages are slow because each row carries a PnL chart.
+- Send `Accept-Encoding: gzip`. Responses over 1 KB are compressed.
